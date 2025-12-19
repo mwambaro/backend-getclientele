@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+  recommender:
+    build: ./microservices/recommender
+    ports:
+      - '8001:8000'
+    depends_on:
+      - redis
+  ai_intent:
+    build: ./microservices/ai_intent
+    ports:
+      - '8002:8000'
+    depends_on:
+      - redis
+  navigation:
+    build: ./microservices/navigation
+    ports:
+      - '8003:8000'
+    depends_on:
+      - redis
+  celery_worker:
+    build: .
+    command: celery -A backend_getclientele worker --loglevel=info
+    volumes:
+      - ./:/code
+    depends_on:
+      - redis
+  # backend (Django) service optional; left unbuilt here - you can add a Dockerfile later

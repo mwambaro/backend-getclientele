@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "getclientele.fullname" . }}-recommender
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: recommender
+  template:
+    metadata:
+      labels:
+        app: recommender
+    spec:
+      containers:
+        - name: recommender
+          image: {{ .Values.images.recommender }}
+          ports:
+            - containerPort: 8000

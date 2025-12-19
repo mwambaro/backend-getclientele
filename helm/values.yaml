@@ -1,0 +1,16 @@
+replicaCount: 1
+
+images:
+  recommender: ghcr.io/OWNER/GETCLIENTELE-recommender:latest
+  ai_intent: ghcr.io/OWNER/GETCLIENTELE-ai_intent:latest
+  navigation: ghcr.io/OWNER/GETCLIENTELE-navigation:latest
+  vector: ghcr.io/OWNER/GETCLIENTELE-vector:latest
+  backend: ghcr.io/OWNER/GETCLIENTELE-backend:latest
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+
+service:
+  type: ClusterIP
+  port: 80

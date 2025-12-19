@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "getclientele.fullname" . }}-vector
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: vector
+  template:
+    metadata:
+      labels:
+        app: vector
+    spec:
+      containers:
+        - name: vector
+          image: {{ .Values.images.vector }}
+          ports:
+            - containerPort: 8000
