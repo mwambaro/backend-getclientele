@@ -1,0 +1,41 @@
+# GetClientele — HTTPie examples (save as `scripts/httpie/test_api.http`)
+
+### 1) Login (get access token)
+POST http://localhost:8000/auth/login/ Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password"
+}
+
+# Save token in a shell variable (bash):
+# export TOKEN=$(http --body POST http://localhost:8000/auth/login/ username=admin password=password | jq -r .access)
+
+### 2) List vendors (no auth required)
+GET http://localhost:8000/vendors/
+
+### 3) Create a vendor (authenticated)
+POST http://localhost:8000/vendors/ Authorization:"Bearer {{TOKEN}}" Content-Type: application/json
+
+{
+  "business_name": "Tasty Tacos",
+  "is_mobile": true,
+  "location": {"lat": -1.0, "lng": 36.8}
+}
+
+### 4) Call AI similar products
+POST http://localhost:8000/api/ai/similar/ Content-Type: application/json
+
+{
+  "products": [
+    {"id": 1, "name": "Chai", "description": "tea"},
+    {"id": 2, "name": "Coffee", "description": "hot"}
+  ],
+  "product_id": 1,
+  "top_k": 3
+}
+
+# Tips:
+# - Use `http --session=dev` to persist cookies or session headers across requests.
+# - Replace `{{TOKEN}}` with the actual token value obtained from the login response.
+# - The snippet above assumes a local dev server at http://localhost:8000

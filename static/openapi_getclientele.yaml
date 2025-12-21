@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  title: GetClientele API
+  version: 1.0.0
+  description: API spec for GetClientele backend services (auth, vendors, mapping, sessions, AI microservices, payments)
+servers:
+  - url: https://api.getclientele.example.com/v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    oauth2:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: https://auth.getclientele.example.com/oauth/token
+          scopes: {}
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        full_name:
+          type: string
+        nick_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        country:
+          type: string
+        region:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    Vendor:
+      type: object
+      properties:
+        id:
+          type: string
+        business_name:
+          type: string
+        is_mobile:
+          type: boolean
+        location:
+          type: object
+          properties:
+            lat:
+              type: number
+            lng:
+              type: number
+            address:
+              type: string
+        categories:
+          type: array
+          items:
+            type: string
+    IntentRequest:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+        language:
+          type: string
+    RecommendationResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              vendor_id:
+                type: string
+              score:
+                type: number
+              reason:
+                type: string
+    Receipt:
+      type: object
+      properties:
+        id:
+          type: string
+        session:
+          type: string
+          nullable: true
+        vendor:
+          type: string
+        amount:
+          type: number
+        commission:
+          type: number
+        vendor_net:
+          type: number
+        timestamp:
+          type: string
+    Payout:
+      type: object
+      properties:
+        id:
+          type: string
+        vendor:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        stripe_transfer_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+        created_at:
+          type: string
+security:
+  - bearerAuth: []
+paths:
+  /auth/signup:
+    post:
+      summary: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Created
+  /auth/login:
+    post:
+      summary: Login and receive JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Token response
+  /vendors:
+    post:
+      summary: Register a vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vendor'
+      responses:
+        '201':
+          description: Vendor created
+    get:
+      summary: List vendors
+      parameters:
+        - name: market_id
+          in: query
+          schema:
+            type: string
+        - name: lat
+          in: query
+          schema:
+            type: number
+        - name: lng
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: List of vendors
+  /vendors/{vendor_id}:
+    get:
+      summary: Get vendor by id
+      parameters:
+        - name: vendor_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vendor object
+  /map/trace/start:
+    post:
+      summary: Start recording an alley trace
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                market_id:
+                  type: string
+                mapper_id:
+                  type: string
+      responses:
+        '200':
+          description: Trace started with trace_id
+  /map/trace/stop/{id}:
+    post:
+      summary: Stop recording an alley trace and upload points
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                points:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      lat:
+                        type: number
+                      lng:
+                        type: number
+                      ts:
+                        type: string
+      responses:
+        '200':
+          description: Trace stored
+*** End Patch

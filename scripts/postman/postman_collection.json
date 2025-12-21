@@ -1,0 +1,47 @@
+{
+  "info": {
+    "name": "GetClientele - Dev Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Small Postman collection for local dev testing"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{ \"username\": \"admin\", \"password\": \"password\" }" },
+        "url": { "raw": "{{baseUrl}}/auth/login/", "host": [ "{{baseUrl}}" ], "path": [ "auth", "login", "" ] }
+      }
+    },
+    {
+      "name": "List Vendors",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/vendors/", "host": [ "{{baseUrl}}" ], "path": [ "vendors", "" ] }
+      }
+    },
+    {
+      "name": "Create Vendor",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+        "body": { "mode": "raw", "raw": "{\"business_name\": \"Tasty Tacos\", \"is_mobile\": true, \"location\": {\"lat\": -1.0, \"lng\": 36.8}}" },
+        "url": { "raw": "{{baseUrl}}/vendors/", "host": [ "{{baseUrl}}" ], "path": [ "vendors", "" ] }
+      }
+    },
+    {
+      "name": "AI Similar",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{ \"products\": [{\"id\":1,\"name\":\"Chai\",\"description\":\"tea\"}], \"product_id\":1, \"top_k\":3 }" },
+        "url": { "raw": "{{baseUrl}}/api/ai/similar/", "host": [ "{{baseUrl}}" ], "path": [ "api", "ai", "similar", "" ] }
+      }
+    }
+  ]
+}
