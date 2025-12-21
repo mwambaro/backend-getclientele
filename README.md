@@ -40,3 +40,20 @@ docker-compose up
 # start a celery worker locally inside the project venv (if not using docker):
 # celery -A backend_getclientele worker --loglevel=info
 ```
+## Quick API helpers for manual testing 🧰
+
+I added a small `scripts/` folder to the root directory with helper requests and a PowerShell helper to make manual testing fast.
+
+Files included:
+- `scripts/httpie/test_api.http` — HTTPie `.http` examples (login, list vendors, create vendor, AI similar)
+- `scripts/postman/postman_collection.json` — Postman v2.1 collection (import into Postman/Insomnia)
+- `scripts/test-api.ps1` — PowerShell helper that logs in and runs a couple of sanity checks
+
+How to use:
+1. Run dev server locally: `python manage.py runserver 0.0.0.0:8000`
+2. HTTPie (example):
+   - Login: `http --body POST http://localhost:8000/auth/login/ username=admin password=password`
+   - Use returned `access` token in Authorization header for subsequent requests.
+3. Postman: Import `Specs/scripts/postman/postman_collection.json`, set `baseUrl` to `http://localhost:8000`, and run the collection.
+4. PowerShell: `.	est-api.ps1 -BaseUrl http://localhost:8000 -Username admin -Password password`
+
