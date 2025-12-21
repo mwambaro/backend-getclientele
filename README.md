@@ -54,6 +54,6 @@ How to use:
 2. HTTPie (example):
    - Login: `http --body POST http://localhost:8000/auth/login/ username=admin password=password`
    - Use returned `access` token in Authorization header for subsequent requests.
-3. Postman: Import `Specs/scripts/postman/postman_collection.json`, set `baseUrl` to `http://localhost:8000`, and run the collection.
-4. PowerShell: `.	est-api.ps1 -BaseUrl http://localhost:8000 -Username admin -Password password`
+3. Postman: Import `scripts/postman/postman_collection.json`, set `baseUrl` to `http://localhost:8000`, and run the collection.
+4. PowerShell: `.	test-api.ps1 -BaseUrl http://localhost:8000 -Username admin -Password password`
 
