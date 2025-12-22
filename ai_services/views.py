@@ -44,14 +44,22 @@ class RecommendView(views.APIView):
         # try cache first
         import hashlib, json
         cache_key = 'recommend:' + hashlib.sha1(json.dumps({'intent': intent, 'market_id': market_id, 'lat': shopper_lat, 'lng': shopper_lng}, sort_keys=True).encode()).hexdigest()
-        cached = cache.get(cache_key)
+        try:
+            cached = cache.get(cache_key)
+        except Exception:
+            # treat cache connection errors as cache miss
+            cached = None
         if cached:
             return Response(cached)
         try:
             r = requests.post(recommender_url, json=payload, timeout=2.0)
             r.raise_for_status()
             data = r.json()
-            cache.set(cache_key, data, timeout=30)
+            try:
+                cache.set(cache_key, data, timeout=30)
+            except Exception:
+                # ignore cache set errors
+                pass
             # schedule a background recompute to refresh cache asynchronously
             try:
                 compute_and_cache_recommendation.delay(payload, cache_key, 60)

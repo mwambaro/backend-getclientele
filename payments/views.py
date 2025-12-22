@@ -54,8 +54,18 @@ class PayoutView(views.APIView):
             return Response({'detail': 'insufficient balance'}, status=400)
         # create payout record (processing asynchronously)
         payout = Payout.objects.create(vendor=vendor, amount=amt_dec, currency='USD', status='processing')
-        # enqueue background worker to process payout
+        # If vendor has a Stripe account, attempt synchronous transfer in the view (tests expect this behavior);
+        # otherwise enqueue background worker.
         try:
+            if vendor.stripe_account_id:
+                transfer = stripe.Transfer.create(amount=int(float(payout.amount) * 100), currency=payout.currency, destination=vendor.stripe_account_id)
+                payout.stripe_transfer_id = transfer.get('id')
+                payout.status = 'sent'
+                payout.save()
+                acct.balance = float(acct.balance) - amt_dec
+                acct.save()
+                return Response(PayoutSerializer(payout).data, status=200)
+            # enqueue background worker to process payout
             from .tasks import process_payout
             process_payout.delay(payout.id)
         except Exception:

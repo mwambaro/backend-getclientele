@@ -34,3 +34,7 @@ class AddItemView(generics.UpdateAPIView):
         session.cart.append(item)
         session.save()
         return Response(self.get_serializer(session).data)
+
+    def post(self, request, *args, **kwargs):
+        # tests expect POST to add an item
+        return self.update(request, *args, **kwargs)

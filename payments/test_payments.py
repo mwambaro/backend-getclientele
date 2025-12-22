@@ -1,5 +1,6 @@
 from rest_framework.test import APITestCase
 from users.models import User
+from payments.models import Payout
 
 
 class PaymentsTests(APITestCase):

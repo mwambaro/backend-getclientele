@@ -30,3 +30,7 @@ class StopTraceView(generics.UpdateAPIView):
         except Exception:
             pass
         return Response(self.get_serializer(instance).data)
+
+    def post(self, request, *args, **kwargs):
+        # allow POST to stop a trace (tests expect POST)
+        return self.update(request, *args, **kwargs)
