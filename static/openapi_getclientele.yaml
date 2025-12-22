@@ -273,3 +273,273 @@ paths:
       responses:
         '200':
           description: Trace stored
+
+  # AI service endpoints (backend views)
+  /ai/intent/:
+    post:
+      summary: Detect intent from shopper text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntentRequest'
+      responses:
+        '200':
+          description: Intent detected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  intent:
+                    type: object
+  /ai/recommend/:
+    post:
+      summary: Recommend vendors for a shopper intent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                intent:
+                  type: object
+                market_id:
+                  type: string
+                shopper_lat:
+                  type: number
+                shopper_lng:
+                  type: number
+      responses:
+        '200':
+          description: Recommendation response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+  /ai/categorize/:
+    post:
+      summary: Categorize text into product categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: string
+  /ai/rank/:
+    post:
+      summary: Rank items by score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      vendor_id:
+                        type: string
+                      score:
+                        type: number
+      responses:
+        '200':
+          description: Ranked items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+  /ai/navigation/:
+    post:
+      summary: Compute a simple route and distance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start:
+                  type: object
+                destinations:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Route and distance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  route:
+                    type: array
+                    items:
+                      type: object
+                  distance_m:
+                    type: integer
+  /ai/forecast/:
+    get:
+      summary: Forecast expected visitors
+      responses:
+        '200':
+          description: Forecast data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  forecast:
+                    type: array
+                    items:
+                      type: object
+
+  # Public API for AI Similar products (compatibility route)
+  /api/ai/similar/:
+    post:
+      summary: Find similar products (calls recommender or vector services)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      description:
+                        type: string
+                product_id:
+                  type: string
+                top_k:
+                  type: integer
+      responses:
+        '200':
+          description: Similar items (recommender or vector response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        score:
+                          type: number
+
+  # Microservice endpoints (external services) — included for convenience in the UI
+  /microservices/vector/index:
+    post:
+      summary: Index documents into vector service (FAISS/Milvus)
+      servers:
+        - url: http://localhost:8004
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                docs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      description:
+                        type: string
+      responses:
+        '200':
+          description: Inserted count
+  /microservices/vector/query:
+    post:
+      summary: Query vector index
+      servers:
+        - url: http://localhost:8004
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                top_k:
+                  type: integer
+      responses:
+        '200':
+          description: Query results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        score:
+                          type: number
+  /microservices/vector/health:
+    get:
+      summary: Health check for vector microservice
+      servers:
+        - url: http://localhost:8004
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  backend:
+                    type: string

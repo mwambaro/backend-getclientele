@@ -62,3 +62,7 @@ How to use:
 3. Postman: Import `scripts/postman/postman_collection.json`, set `baseUrl` to `http://localhost:8000`, and run the collection.
 4. PowerShell: `.	test-api.ps1 -BaseUrl http://localhost:8000 -Username admin -Password password`
 
+# Next Github Copilot Prompt
+
+Update the codebase as well as the OpenAPI file so that 'vendors'  has a 'products' field. The 'products' model has 3 fileds: product_name, product_sell_price, product_purchase_price. `/ai/intent` must figure out all the products and services needed by the shopper and produce a shopping cart that contains all the products and services the shopper intends to buy.  Hence, create a 'shopping_cart' model that has the following fields: item_name, item_price, total_sum_to_pay. Also, add AI  `/ai/vendor_products` endpoint that gets vendors products and services out of input in a natural language and then populate the 'products' database table. Include tests that reflect these details. Remember to update the OpenAPI file, to create the models needed, and the migrations, and to update Swagger UI.
+
