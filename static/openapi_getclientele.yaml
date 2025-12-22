@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API spec for GetClientele backend services (auth, vendors, mapping, sessions, AI microservices, payments)
 servers:
-  - url: https://api.getclientele.example.com/v1
+  - url: http://localhost:8000
 components:
   securitySchemes:
     bearerAuth:
@@ -40,6 +40,37 @@ components:
           type: array
           items:
             type: string
+    SignupRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        nick_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        country:
+          type: string
+        region:
+          type: string
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
     Vendor:
       type: object
       properties:
@@ -123,7 +154,7 @@ components:
 security:
   - bearerAuth: []
 paths:
-  /auth/signup:
+  /auth/signup/:
     post:
       summary: Create a new user account
       requestBody:
@@ -131,11 +162,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/SignupRequest'
       responses:
         '201':
           description: Created
-  /auth/login:
+  /auth/login/:
     post:
       summary: Login and receive JWT token
       requestBody:
@@ -143,18 +174,15 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
           description: Token response
-  /vendors:
+  /vendors/:
     post:
       summary: Register a vendor
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -182,7 +210,7 @@ paths:
       responses:
         '200':
           description: List of vendors
-  /vendors/{vendor_id}:
+  /vendors/{vendor_id}/:
     get:
       summary: Get vendor by id
       parameters:
@@ -194,7 +222,7 @@ paths:
       responses:
         '200':
           description: Vendor object
-  /map/trace/start:
+  /map/trace/start/:
     post:
       summary: Start recording an alley trace
       security:
@@ -213,7 +241,7 @@ paths:
       responses:
         '200':
           description: Trace started with trace_id
-  /map/trace/stop/{id}:
+  /map/trace/stop/{id}/:
     post:
       summary: Stop recording an alley trace and upload points
       security:
@@ -245,4 +273,3 @@ paths:
       responses:
         '200':
           description: Trace stored
-*** End Patch
