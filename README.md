@@ -1,3 +1,8 @@
+[![CI — Run tests](https://github.com/mwambaro/backend-getclientele/actions/workflows/ci_run_tests.yml/badge.svg)](https://github.com/mwambaro/backend-getclientele/actions/workflows/ci_run_tests.yml)
+
+[![CI](https://github.com/mwambaro/backend-getclientele/actions/workflows/ci.yml/badge.svg)](https://github.com/mwambaro/backend-getclientele/actions/workflows/ci.yml)
+
+
 # backend_getclientele (Django)
 
 This Django project contains the backend API for GetClientele as specified.
