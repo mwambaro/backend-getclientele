@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import IntentView, RecommendView, CategorizeView, RankView, NavigationView, ForecastView
+from .views import IntentView, RecommendView, CategorizeView, RankView, NavigationView, ForecastView, SimilarView, VendorProductsView
 
 urlpatterns = [
     path('intent/', IntentView.as_view(), name='ai_intent'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('rank/', RankView.as_view(), name='ai_rank'),
     path('navigation/', NavigationView.as_view(), name='ai_navigation'),
     path('forecast/', ForecastView.as_view(), name='ai_forecast'),
+    path('vendor_products/', VendorProductsView.as_view(), name='ai_vendor_products'),
 ]

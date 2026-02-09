@@ -9,4 +9,4 @@ class VendorAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'vendor', 'price')
+    list_display = ('product_name', 'vendor', 'product_sell_price')

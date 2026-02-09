@@ -71,6 +71,27 @@ components:
           type: string
         password:
           type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        vendor:
+          type: integer
+        product_name:
+          type: string
+        product_sell_price:
+          type: number
+          format: double
+        product_purchase_price:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     Vendor:
       type: object
       properties:
@@ -93,6 +114,29 @@ components:
           type: array
           items:
             type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    ShoppingCart:
+      type: object
+      properties:
+        id:
+          type: integer
+        item_name:
+          type: string
+        item_price:
+          type: number
+          format: double
+        total_sum_to_pay:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     IntentRequest:
       type: object
       required: [text]
@@ -277,7 +321,8 @@ paths:
   # AI service endpoints (backend views)
   /ai/intent/:
     post:
-      summary: Detect intent from shopper text
+      summary: Detect intent from shopper text and extract shopping cart items
+      description: Analyzes natural language input to detect shopping intent and extract products/services needed by the shopper. Returns shopping cart items with prices.
       requestBody:
         required: true
         content:
@@ -286,7 +331,7 @@ paths:
               $ref: '#/components/schemas/IntentRequest'
       responses:
         '200':
-          description: Intent detected
+          description: Intent detected with shopping cart
           content:
             application/json:
               schema:
@@ -296,6 +341,21 @@ paths:
                     type: string
                   intent:
                     type: object
+                    properties:
+                      category:
+                        type: string
+                      price:
+                        type: string
+                      audience:
+                        type: string
+                        nullable: true
+                  shopping_cart:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShoppingCart'
+                  total_sum_to_pay:
+                    type: number
+                    format: double
   /ai/recommend/:
     post:
       summary: Recommend vendors for a shopper intent
@@ -421,6 +481,62 @@ paths:
                     type: array
                     items:
                       type: object
+
+  /ai/vendor_products/:
+    post:
+      summary: Extract vendor products and services from natural language input
+      description: Parses natural language input to extract products and services for a vendor. Automatically populates the products database table with extracted items. Supports price extraction from text patterns like "Apple $1.50" or "Orange at $2.00".
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vendor_id, text]
+              properties:
+                vendor_id:
+                  type: integer
+                  description: The ID of the vendor for which to extract products
+                text:
+                  type: string
+                  description: Natural language text describing products and services. Can include prices like "Apple $1.50, Orange $2.00, Banana $0.75"
+      responses:
+        '200':
+          description: Products extracted and saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  vendor_id:
+                    type: integer
+                  products_extracted:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  count:
+                    type: integer
+                    description: Number of products extracted
+        '400':
+          description: Missing or invalid vendor_id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Vendor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
   # Public API for AI Similar products (compatibility route)
   /api/ai/similar/:
